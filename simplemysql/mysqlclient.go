@@ -93,7 +93,7 @@ func (m *MySQLUtil) Query(sql string,  resultlist []interface{}, result ...inter
 		} else {
             resultlist = append(resultlist, result)
 			cnt += 1
-			break
+			//break
 		}
 	}
 
