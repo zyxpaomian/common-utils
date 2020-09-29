@@ -2,10 +2,10 @@ package agentlog
 
 import (
 	"fmt"
+	"github.com/Sirupsen/logrus"
 	"os"
 	"runtime"
 	"strings"
-	"github.com/Sirupsen/logrus"
 )
 
 type Fields logrus.Fields
