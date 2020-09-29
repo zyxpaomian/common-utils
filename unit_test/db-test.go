@@ -1,7 +1,7 @@
 package main
 
 import (
-    "github.com/zyxpaomian/common-utils/mysqlclient"
+    db "github.com/zyxpaomian/common-utils/mysqlclient"
     "fmt"
 )
 
@@ -16,9 +16,9 @@ func main() {
     userPass := "root"
     addPort := "192.168.159.133:3306"
     dataBase := "rinck"
-    mysqlclient.DbInit(userName, userPass, addPort, dataBase)
+    db.DbInit(userName, userPass, addPort, dataBase)
     sql = "select * from agent_status;"
-    cnt, err := mysqlclient.db.Query(sql, []&Agents, &Agents)
+    cnt, err := db.db.Query(sql, []&Agents, &Agents)
     if err != nil {
         fmt.Println(err)
     }

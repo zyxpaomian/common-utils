@@ -1,4 +1,4 @@
-package mysqlclient
+package simplemysql
 
 import (
 	"database/sql"
