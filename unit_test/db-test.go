@@ -21,14 +21,19 @@ func main() {
     //AgentList := []*Agent{}
     Agents := []Agent{}
     AgentList := make([]interface{}, 2)
+    
     for i, v := range Agents {
         AgentList[i] = v
     }
     agentObject := &Agent{}
-    cnt, err := simplemysql.DB.Query(sql, AgentList, &agentObject.Agentip, &agentObject.Alive, &agentObject.Dpswitch)
+    cnt, err := simplemysql.DB.Query(sql, &AgentList, &agentObject.Agentip, &agentObject.Alive, &agentObject.Dpswitch)
     if err != nil {
         fmt.Println(err)
     }
     fmt.Println(cnt)
+    fmt.Println(AgentList)
     fmt.Println(agentObject.Agentip)
 }
+
+
+

@@ -64,7 +64,7 @@ func (m *MySQLUtil) GetTx() (*sql.Tx, error) {
 
 
 // 基本查询,基于结构体进行查询，返回值是查询的具体行数
-func (m *MySQLUtil) Query(sql string,  resultlist []interface{}, result ...interface{}) (int64, error) {
+func (m *MySQLUtil) Query(sql string,  resultlist *[]interface{}, result ...interface{}) (int64, error) {
 	tx, err := m.GetTx()
 	if err != nil {
 		return -1, err
