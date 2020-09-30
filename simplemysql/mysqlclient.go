@@ -91,7 +91,7 @@ func (m *MySQLUtil) Query(sql string,  resultlist *[]interface{}, result ...inte
 			tx.Rollback()
 			return -1, err
 		} else {
-            *resultlist = append(resultlist, result)
+            *resultlist = append(*resultlist, result)
 			cnt += 1
 			//break
 		}
