@@ -64,22 +64,23 @@ func (m *MySQLUtil) GetTx() (*sql.Tx, error) {
 
 
 // 基本查询,基于结构体进行查询，返回值是查询的具体行数
-func (m *MySQLUtil) Query(sql string,  resultlist *[]interface{}, result ...interface{}) (int64, error) {
+func (m *MySQLUtil) Query(sql string, result ...interface{}) ([]interface{}, int64, error) {
+	resultlist := []interface{}
 	tx, err := m.GetTx()
 	if err != nil {
-		return -1, err
+		return nil, -1, err
 	}
 
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
 		tx.Rollback()
-		return -1, err
+		return nil, -1, err
 	}
 
 	rows, err := stmt.Query()
 	if err != nil {
 		stmt.Close()
-		return -1, err
+		return nil, -1, err
 	}
 
 	var cnt int64 = 0
@@ -89,9 +90,9 @@ func (m *MySQLUtil) Query(sql string,  resultlist *[]interface{}, result ...inte
 			rows.Close()
 			stmt.Close()
 			tx.Rollback()
-			return -1, err
+			return nil, -1, err
 		} else {
-            *resultlist = append(*resultlist, result)
+            resultlist = append(resultlist, result)
 			cnt += 1
 			//break
 		}
@@ -102,12 +103,12 @@ func (m *MySQLUtil) Query(sql string,  resultlist *[]interface{}, result ...inte
 		rows.Close()
 		stmt.Close()
 		tx.Rollback()
-		return -1, err
+		return nil, -1, err
 	}
 	rows.Close()
 	stmt.Close()
 	tx.Commit()
-	return cnt, nil
+	return resultlist, cnt, nil
 }
 
 /*
