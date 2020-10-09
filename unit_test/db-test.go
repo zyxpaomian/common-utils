@@ -3,6 +3,7 @@ package main
 import (
     "github.com/zyxpaomian/common-utils/simplemysql"
     "fmt"
+    "github.com/jmoiron/sqlx"
 )
 
 type Agent struct {
@@ -11,69 +12,92 @@ type Agent struct {
     Dpswitch    int
 }
 
+func SingleQuery(db *sqlx.DB) {
+    sql := "select agentip, alive, dpswitch from agent_status where agentip = ?"
+    var a Agent
+    err := db.Get(&a, sql, "1.1.1.1")
+
+	if err != nil {
+		fmt.Printf("get failed, err: %v \n", err)
+		return
+	}
+    fmt.Printf("Single Data Query --- ip: %s alive: %d Dpswitch: %d\n", a.Agentip, a.Alive, a.Dpswitch)    
+}
+
+func MultiQuery(db *sqlx.DB) {
+    sql := "select agentip, alive, dpswitch from agent_status where alive = ?"
+    var as []Agent
+    err := db.Select(&as, sql, 1)
+    if err != nil {
+        fmt.Printf("get failed, err: %v \n", err)
+        return
+    }
+    for k, v := range(as){
+        fmt.Printf("Multi Data Query row line: %d --- ip: %s alive: %d Dpswitch: %d\n", k, v.Agentip, v.Alive, v.Dpswitch)
+    }
+}
+
+func SingleInsert(db *sqlx.DB) {
+	sql := "insert into agent_status(agentip, alive, dpswitch) values (?, ?, ?)"
+	ret, err := db.Exec(sql, "2.2.2.7", 0, 1)
+	if err != nil {
+		fmt.Printf("insert failed, err: %v \n", err)
+		return
+	}
+	theID, err := ret.LastInsertId()
+	if err != nil {
+		fmt.Printf("get lastinsert ID failed, err: %v \n", err)
+		return
+	}
+	fmt.Printf("insert success, the id is %d. \n", theID)  
+}
+
+func Update(db *sqlx.DB) {
+	sql := "update agent_status set alive= ? where dpswitch = ?"
+	ret, err := db.Exec(sql, 1, 1)
+	if err != nil {
+		fmt.Printf("update failed, err: %v \n", err)
+		return
+	}
+	n, err := ret.RowsAffected()
+	if err != nil {
+		fmt.Printf("get RowsAffected failed, err: %v \n", err)
+		return
+	}
+	fmt.Printf("update success, affected rows: %d \n", n)
+}
+
+func Delete(db *sqlx.DB) {
+	sql := "delete from agent_status where alive = ?"
+	ret, err := db.Exec(sql, 1)
+	if err != nil {
+		fmt.Printf("delete failed, err: %v \n", err)
+		return
+	}
+	n, err := ret.RowsAffected()
+	if err != nil {
+		fmt.Printf("get RowsAffected failed, err: %v \n", err)
+		return
+	}
+	fmt.Printf("delete success, affected rows: %d \n", n)
+}
+
 func main() {
     userName := "root"
     userPass := "root"
     addPort := "192.168.159.133:3306"
     dataBase := "rinck"
     simplemysql.DB.DbInit(userName, userPass, addPort, dataBase)
-    var db *simplemysql.DB.db
 
-    sql := "select agentip, alive, dpswitch from agent_status;"
+    db := simplemysql.DB.Con
+    SingleQuery(db)
+    MultiQuery(db)
+    SingleInsert(db)
+    Update(db)
+    Delete(db)
 
-    var a Agent
-    err := db.Get(&a, sql, 1)
-	if err != nil {
-		fmt.Printf("get failed, err:%v\n", err)
-		return
-	}
-    fmt.Printf("ip:%s alive:%s Dpswitch:%d\n", a.Agentip, a.Alive, a.Dpswitch)
 
-    /*agentObject := &Agent{}
-    _, err := simplemysql.DB.Query(sql, &agentObject.Agentip, &agentObject.Alive, &agentObject.Dpswitch)
-    if err != nil {
-        fmt.Println(err)
-    }
+  
 
-    fmt.Println(agentObject.Agentip)
-    //for _, v := range(agentObject){
-        //fmt.Println(v)
-    //}
 
-    //AgentList := []*Agent{}
-    /*Agents := []Agent{}
-    AgentList := make([]interface{}, 0)
-    
-    for i, v := range Agents {
-        AgentList[i] = v
-    }
-    fmt.Println(AgentList)
-    agentObject := &Agent{}
-    fmt.Printf("%T\n",&agentObject.Agentip)
-    _, err := simplemysql.DB.Query(sql, &AgentList, &agentObject.Agentip, &agentObject.Alive, &agentObject.Dpswitch)
-    if err != nil {
-        fmt.Println(err)
-    }
-    for _, v := range AgentList {
-        fmt.Printf("%T\n",v)
-        op, _ := v.(Agent)
-        fmt.Println(op.Agentip)
-    }
-
-    //fmt.Println(AgentList)
-    //fmt.Println(cnt)
-    /*fmt.Printf("%T\n",aa)
-    for _, v := range aa {
-        fmt.Printf("%T\n",v)
-        op, _ := v.(Agent)
-        fmt.Println(op.Agentip)
-        /*p, ok := (v.Value).(Agent)
-        if ok {
-            fmt.Println(p)
-        } else {            
-            fmt.Println("err")
-        }*/
-       // fmt.Printf("%T",v)
-    //}*/
-    //fmt.Println(agentObject.Agentip)
 }

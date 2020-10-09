@@ -1,26 +1,20 @@
-package simplemysq
+package simplemysql
 
 import (
-	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
 
 
-
-//var db *sqlx.DB
-
 type MySQLUtil struct {
-	db          *sql.DB
-	initialized bool
+	Con         *sqlx.DB
 }
 
-var DB = MySQLUtil{db: nil, initialized: false}
+var DB = MySQLUtil{Con: nil}
 
 func (m *MySQLUtil) DbInit(userName, userPass, addrPort, dataBase string) {
-	//dsn := "user:password@tcp(127.0.0.1:3306)/sql_test?charset=utf8mb4&parseTime=True"
-	connFormat := "%s:%s@tcp(%s)/%s?autocommit=0&collation=utf8_general_ci&parseTime=true"
+	connFormat := "%s:%s@tcp(%s)/%s?autocommit=1&collation=utf8_general_ci&parseTime=true"
 	connStr := fmt.Sprintf(
 		connFormat,
         userName,
@@ -43,11 +37,6 @@ func (m *MySQLUtil) DbInit(userName, userPass, addrPort, dataBase string) {
 		panic("mysql初始化失败,ping失败")
 	}
 
-	m.db = db
-	m.initialized = true
-
+	m.Con = db
 	return
 }
-
-
-
