@@ -1,4 +1,4 @@
-package agentlog
+package formatlog
 
 import (
 	"fmt"
